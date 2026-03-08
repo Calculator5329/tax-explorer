@@ -46,11 +46,15 @@ function App() {
         </select>
       </header>
 
-      <div className="chart-container">
-        <TaxChart buckets={stateData.buckets} onHover={handleHover} />
+      <div className="dashboard-grid">
+        <div className="panel main-chart">
+          <div className="panel-title">Effective Tax Rate by Income Group</div>
+          <div className="chart-container">
+            <TaxChart buckets={stateData.buckets} onHover={handleHover} />
+          </div>
+          <Legend />
+        </div>
       </div>
-
-      <Legend />
 
       <div className="source-attribution">
         Data sources: ITEP "Who Pays?" 7th Edition, CBO Distributional Analysis, IRS SOI, SSA

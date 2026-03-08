@@ -9,7 +9,7 @@ interface TaxChartProps {
   onHover: (event: MouseEvent, bucket: BucketData | null) => void
 }
 
-const MARGIN = { top: 20, right: 30, bottom: 60, left: 50 }
+const MARGIN = { top: 20, right: 30, bottom: 70, left: 50 }
 
 export default function TaxChart({ buckets, onHover }: TaxChartProps) {
   const svgRef = useRef<SVGSVGElement>(null)
@@ -128,9 +128,12 @@ export default function TaxChart({ buckets, onHover }: TaxChartProps) {
         .attr('x', b => (x(b.label) ?? 0) + x.bandwidth() / 2)
         .attr('y', 50)
         .attr('text-anchor', 'middle')
-        .attr('fill', '#5f6368')
-        .attr('font-size', '0.6rem')
-        .text(b => `$${(b.avgIncome / 1000).toFixed(0)}k`)
+        .attr('fill', '#9aa0a6')
+        .attr('font-size', '0.75rem')
+        .attr('font-weight', '500')
+        .text(b => b.avgIncome >= 1_000_000
+          ? `$${(b.avgIncome / 1_000_000).toFixed(1)}M`
+          : `$${(b.avgIncome / 1000).toFixed(0)}k`)
 
     // Y axis
     g.append('g')

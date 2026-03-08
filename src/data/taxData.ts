@@ -139,6 +139,17 @@ const texas: StateData = {
   })),
 }
 
+const minnesota: StateData = {
+  name: 'Minnesota',
+  abbreviation: 'MN',
+  buckets: nationalAverage.buckets.map((b, i) => ({
+    ...b,
+    stateIncome: b.stateIncome * (1.4 + i * 0.09),  // progressive state income tax
+    property: b.property * 1.15,
+    salesExcise: b.salesExcise * 0.95,  // slightly lower sales tax, clothing exempt
+  })),
+}
+
 const newYork: StateData = {
   name: 'New York',
   abbreviation: 'NY',
@@ -149,7 +160,7 @@ const newYork: StateData = {
   })),
 }
 
-const allStates: StateData[] = [nationalAverage, california, florida, newYork, texas]
+const allStates: StateData[] = [nationalAverage, california, florida, minnesota, newYork, texas]
 
 export function getAllStates(): StateData[] {
   return allStates
