@@ -7,7 +7,7 @@ import WaterfallChart from './components/WaterfallChart'
 import HistoricalChart from './components/HistoricalChart'
 import IncomeCompositionChart from './components/IncomeCompositionChart'
 import { getAllStates, getStateData } from './data/taxData'
-import { applyTcjaExpiration } from './data/tcjaData'
+
 import { INCOME_SOURCES } from './data/incomeComposition'
 import { TAX_LAYERS } from './data/types'
 import type { BucketData } from './data/types'
@@ -28,7 +28,6 @@ function App() {
   const [selectedState, setSelectedState] = useState('US')
   const [compareStates, setCompareStates] = useState<string[]>(['US', 'CA', 'TX'])
   const [income, setIncome] = useState(85000)
-  const [postTcja, setPostTcja] = useState(false)
   const [tooltip, setTooltip] = useState<{
     bucket: BucketData | null
     x: number
@@ -38,10 +37,7 @@ function App() {
   const stateData = getStateData(selectedState)
   const states = getAllStates()
 
-  const activeBuckets = useMemo(() => {
-    if (!stateData) return []
-    return postTcja ? applyTcjaExpiration(stateData.buckets) : stateData.buckets
-  }, [stateData, postTcja])
+  const activeBuckets = stateData?.buckets ?? []
 
   // Stats computations
   const stats = useMemo(() => {
@@ -99,17 +95,7 @@ function App() {
           </p>
         </div>
         <div className="header-controls">
-          <div className="tcja-toggle">
-            <span className={`tcja-label ${!postTcja ? 'active' : ''}`}>Current Law</span>
-            <div
-              className={`toggle-track ${postTcja ? 'active' : ''}`}
-              onClick={() => setPostTcja(p => !p)}
-            >
-              <div className="toggle-thumb" />
-            </div>
-            <span className={`tcja-label ${postTcja ? 'active' : ''}`}>Repeal TCJA</span>
-          </div>
-          <select
+<select
             className="state-select"
             value={selectedState}
             onChange={e => setSelectedState(e.target.value)}
@@ -148,7 +134,7 @@ function App() {
         <div className="panel main-chart">
           <div className="panel-title">
             Effective Tax Rate by Income Group
-            {postTcja && <span style={{ color: 'var(--accent)', marginLeft: '0.5rem', fontSize: '0.65rem', fontWeight: 500, textTransform: 'none' }}>TCJA Repealed</span>}
+
           </div>
           <div className="chart-container">
             <TaxChart buckets={activeBuckets} onHover={handleHover} onClick={handleChartClick} />
