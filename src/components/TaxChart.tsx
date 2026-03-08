@@ -1,5 +1,5 @@
 // src/components/TaxChart.tsx
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as d3 from 'd3'
 import type { BucketData } from '../data/types'
 import { TAX_LAYERS } from '../data/types'
@@ -13,16 +13,27 @@ const MARGIN = { top: 20, right: 30, bottom: 60, left: 50 }
 
 export default function TaxChart({ buckets, onHover }: TaxChartProps) {
   const svgRef = useRef<SVGSVGElement>(null)
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
 
   useEffect(() => {
-    if (!svgRef.current) return
-
-    const svg = d3.select(svgRef.current)
-    const container = svgRef.current.parentElement
+    const container = svgRef.current?.parentElement
     if (!container) return
 
-    const width = container.clientWidth
-    const height = container.clientHeight
+    const observer = new ResizeObserver(entries => {
+      const { width, height } = entries[0].contentRect
+      setDimensions({ width, height })
+    })
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!svgRef.current || dimensions.width === 0 || dimensions.height === 0) return
+
+    const svg = d3.select(svgRef.current)
+
+    const width = dimensions.width
+    const height = dimensions.height
     const innerWidth = width - MARGIN.left - MARGIN.right
     const innerHeight = height - MARGIN.top - MARGIN.bottom
 
@@ -140,7 +151,7 @@ export default function TaxChart({ buckets, onHover }: TaxChartProps) {
     g.selectAll('.domain').attr('stroke', '#2d3748')
     g.selectAll('.tick line').attr('stroke', '#2d3748')
 
-  }, [buckets, onHover])
+  }, [buckets, onHover, dimensions])
 
   return <svg ref={svgRef} style={{ width: '100%', height: '100%' }} />
 }
