@@ -100,14 +100,14 @@ function App() {
         </div>
         <div className="header-controls">
           <div className="tcja-toggle">
-            <span className={`tcja-label ${!postTcja ? 'active' : ''}`}>2025 Law</span>
+            <span className={`tcja-label ${!postTcja ? 'active' : ''}`}>Current Law</span>
             <div
               className={`toggle-track ${postTcja ? 'active' : ''}`}
               onClick={() => setPostTcja(p => !p)}
             >
               <div className="toggle-thumb" />
             </div>
-            <span className={`tcja-label ${postTcja ? 'active' : ''}`}>Post-2026</span>
+            <span className={`tcja-label ${postTcja ? 'active' : ''}`}>Repeal TCJA</span>
           </div>
           <select
             className="state-select"
@@ -148,7 +148,7 @@ function App() {
         <div className="panel main-chart">
           <div className="panel-title">
             Effective Tax Rate by Income Group
-            {postTcja && <span style={{ color: 'var(--accent)', marginLeft: '0.5rem', fontSize: '0.65rem', fontWeight: 500, textTransform: 'none' }}>Post-TCJA Expiration</span>}
+            {postTcja && <span style={{ color: 'var(--accent)', marginLeft: '0.5rem', fontSize: '0.65rem', fontWeight: 500, textTransform: 'none' }}>TCJA Repealed</span>}
           </div>
           <div className="chart-container">
             <TaxChart buckets={activeBuckets} onHover={handleHover} onClick={handleChartClick} />
