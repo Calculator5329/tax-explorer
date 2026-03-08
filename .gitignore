@@ -6,6 +6,11 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+.claude
+.firebase
+.firebaserc
+.firebaseignore
+.firebaseignore
 
 node_modules
 dist
