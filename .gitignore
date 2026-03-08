@@ -11,7 +11,7 @@ lerna-debug.log*
 .firebaserc
 .firebaseignore
 .firebaseignore
-
+.claude/*
 node_modules
 dist
 dist-ssr

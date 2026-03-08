@@ -4,7 +4,8 @@
       "Bash(npx vitest:*)",
       "Bash(npx tsc:*)",
       "Bash(npm run:*)",
-      "Bash(firebase hosting:sites:create:*)"
+      "Bash(firebase hosting:sites:create:*)",
+      "Bash(firebase deploy:*)"
     ]
   }
 }
