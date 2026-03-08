@@ -1,11 +1,16 @@
 :root {
-  --bg-primary: #0f1419;
-  --bg-secondary: #1a1f2e;
+  --bg-primary: #0a0e13;
+  --bg-secondary: #141a24;
+  --bg-card: #1a2233;
   --text-primary: #e8eaed;
   --text-secondary: #9aa0a6;
   --text-muted: #5f6368;
   --accent: #4e79a7;
-  --border: #2d3748;
+  --accent-glow: rgba(78, 121, 167, 0.15);
+  --border: #1e2d3d;
+  --border-hover: #2d4a5e;
+  --green: #2ecc71;
+  --red: #e15759;
 
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
@@ -32,4 +37,26 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+::selection {
+  background: var(--accent);
+  color: white;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
 }

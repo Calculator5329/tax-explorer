@@ -1,5 +1,4 @@
-// src/App.tsx
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import TaxChart from './components/TaxChart'
 import Tooltip from './components/Tooltip'
 import Legend from './components/Legend'
@@ -8,14 +7,28 @@ import WaterfallChart from './components/WaterfallChart'
 import HistoricalChart from './components/HistoricalChart'
 import IncomeCompositionChart from './components/IncomeCompositionChart'
 import { getAllStates, getStateData } from './data/taxData'
+import { applyTcjaExpiration } from './data/tcjaData'
 import { INCOME_SOURCES } from './data/incomeComposition'
+import { TAX_LAYERS } from './data/types'
 import type { BucketData } from './data/types'
 import './App.css'
+
+function formatPct(rate: number): string {
+  return `${(rate * 100).toFixed(1)}%`
+}
+
+function getTotalRate(bucket: BucketData): number {
+  return TAX_LAYERS.reduce(
+    (sum, layer) => sum + (bucket[layer.key as keyof BucketData] as number),
+    0
+  )
+}
 
 function App() {
   const [selectedState, setSelectedState] = useState('US')
   const [compareStates, setCompareStates] = useState<string[]>(['US', 'CA', 'TX'])
   const [income, setIncome] = useState(85000)
+  const [postTcja, setPostTcja] = useState(false)
   const [tooltip, setTooltip] = useState<{
     bucket: BucketData | null
     x: number
@@ -25,8 +38,45 @@ function App() {
   const stateData = getStateData(selectedState)
   const states = getAllStates()
 
+  const activeBuckets = useMemo(() => {
+    if (!stateData) return []
+    return postTcja ? applyTcjaExpiration(stateData.buckets) : stateData.buckets
+  }, [stateData, postTcja])
+
+  // Stats computations
+  const stats = useMemo(() => {
+    if (activeBuckets.length === 0) return null
+
+    const medianBucket = activeBuckets[2] // 40-60%
+    const topBucket = activeBuckets[activeBuckets.length - 1]
+    const bottomBucket = activeBuckets[0]
+
+    const medianRate = getTotalRate(medianBucket)
+    const topRate = getTotalRate(topBucket)
+
+    // Most regressive: biggest ratio of bottom rate to top rate
+    const layerRegressivity = TAX_LAYERS.map(layer => {
+      const bottomVal = bottomBucket[layer.key as keyof BucketData] as number
+      const topVal = topBucket[layer.key as keyof BucketData] as number
+      return { label: layer.label, ratio: topVal > 0 ? bottomVal / topVal : 0 }
+    }).filter(l => l.ratio > 1)
+    layerRegressivity.sort((a, b) => b.ratio - a.ratio)
+    const mostRegressive = layerRegressivity[0]?.label.replace(' Tax', '') ?? 'N/A'
+
+    // Cap gains as share of total federal tax at top
+    const topCapGains = topBucket.capitalGains
+    const topFedTotal = topBucket.federalIncome + topBucket.capitalGains
+    const capGainsShare = topFedTotal > 0 ? topCapGains / topFedTotal : 0
+
+    return { medianRate, topRate, mostRegressive, capGainsShare }
+  }, [activeBuckets])
+
   const handleHover = useCallback((event: MouseEvent, bucket: BucketData | null) => {
     setTooltip({ bucket, x: event.clientX, y: event.clientY })
+  }, [])
+
+  const handleChartClick = useCallback((bucket: BucketData) => {
+    setIncome(bucket.avgIncome)
   }, [])
 
   const toggleCompareState = (abbr: string) => {
@@ -37,7 +87,7 @@ function App() {
     )
   }
 
-  if (!stateData) return null
+  if (!stateData || !stats) return null
 
   return (
     <div className="app">
@@ -48,26 +98,63 @@ function App() {
             All major taxes as % of pre-tax income, by income percentile
           </p>
         </div>
-        <select
-          className="state-select"
-          value={selectedState}
-          onChange={e => setSelectedState(e.target.value)}
-        >
-          {states.map(s => (
-            <option key={s.abbreviation} value={s.abbreviation}>
-              {s.name}
-            </option>
-          ))}
-        </select>
+        <div className="header-controls">
+          <div className="tcja-toggle">
+            <span className={`tcja-label ${!postTcja ? 'active' : ''}`}>2025 Law</span>
+            <div
+              className={`toggle-track ${postTcja ? 'active' : ''}`}
+              onClick={() => setPostTcja(p => !p)}
+            >
+              <div className="toggle-thumb" />
+            </div>
+            <span className={`tcja-label ${postTcja ? 'active' : ''}`}>Post-2026</span>
+          </div>
+          <select
+            className="state-select"
+            value={selectedState}
+            onChange={e => setSelectedState(e.target.value)}
+          >
+            {states.map(s => (
+              <option key={s.abbreviation} value={s.abbreviation}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </header>
+
+      <div className="stats-row">
+        <div className="stat-card">
+          <div className="stat-value">{formatPct(stats.medianRate)}</div>
+          <div className="stat-label">Median Total Rate (40–60%)</div>
+        </div>
+        <div className="stat-card">
+          <div className={`stat-value ${stats.topRate < stats.medianRate ? 'highlight-red' : ''}`}>
+            {formatPct(stats.topRate)}
+          </div>
+          <div className="stat-label">Top 0.01% Total Rate</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value highlight-accent">{stats.mostRegressive}</div>
+          <div className="stat-label">Most Regressive Tax</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">{formatPct(stats.capGainsShare)}</div>
+          <div className="stat-label">Cap Gains Share of Fed Tax (Top)</div>
+        </div>
+      </div>
 
       <div className="dashboard-grid">
         <div className="panel main-chart">
-          <div className="panel-title">Effective Tax Rate by Income Group</div>
+          <div className="panel-title">
+            Effective Tax Rate by Income Group
+            {postTcja && <span style={{ color: 'var(--accent)', marginLeft: '0.5rem', fontSize: '0.65rem', fontWeight: 500, textTransform: 'none' }}>Post-TCJA Expiration</span>}
+          </div>
           <div className="chart-container">
-            <TaxChart buckets={stateData.buckets} onHover={handleHover} />
+            <TaxChart buckets={activeBuckets} onHover={handleHover} onClick={handleChartClick} />
           </div>
           <Legend />
+          <div className="click-hint">Click a bar to update Your Tax Breakdown</div>
         </div>
 
         <div className="panel half-chart">
@@ -106,7 +193,7 @@ function App() {
             </div>
           </div>
           <div className="chart-container">
-            <WaterfallChart income={income} buckets={stateData.buckets} />
+            <WaterfallChart income={income} buckets={activeBuckets} />
           </div>
         </div>
 
@@ -134,7 +221,7 @@ function App() {
       </div>
 
       <div className="source-attribution">
-        Data sources: ITEP "Who Pays?" 7th Edition, CBO Distributional Analysis, IRS SOI, SSA, Saez-Zucman
+        Data: ITEP "Who Pays?" 7th Edition &middot; CBO Distributional Analysis &middot; IRS SOI &middot; SSA &middot; Saez-Zucman &middot; Tax Policy Center
       </div>
 
       <Tooltip bucket={tooltip.bucket} x={tooltip.x} y={tooltip.y} />

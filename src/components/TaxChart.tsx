@@ -7,11 +7,12 @@ import { TAX_LAYERS } from '../data/types'
 interface TaxChartProps {
   buckets: BucketData[]
   onHover: (event: MouseEvent, bucket: BucketData | null) => void
+  onClick?: (bucket: BucketData) => void
 }
 
 const MARGIN = { top: 20, right: 30, bottom: 70, left: 50 }
 
-export default function TaxChart({ buckets, onHover }: TaxChartProps) {
+export default function TaxChart({ buckets, onHover, onClick }: TaxChartProps) {
   const svgRef = useRef<SVGSVGElement>(null)
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
 
@@ -105,6 +106,11 @@ export default function TaxChart({ buckets, onHover }: TaxChartProps) {
           onHover(event, null)
           d3.select(this).style('opacity', 1)
         })
+        .on('click', function() {
+          const datum = d3.select(this).datum() as d3.SeriesPoint<Record<string, number | string>>
+          const bucket = buckets.find(b => b.label === datum.data.label)
+          if (bucket && onClick) onClick(bucket)
+        })
 
     // X axis
     g.append('g')
@@ -154,7 +160,7 @@ export default function TaxChart({ buckets, onHover }: TaxChartProps) {
     g.selectAll('.domain').attr('stroke', '#2d3748')
     g.selectAll('.tick line').attr('stroke', '#2d3748')
 
-  }, [buckets, onHover, dimensions])
+  }, [buckets, onHover, onClick, dimensions])
 
   return <svg ref={svgRef} style={{ width: '100%', height: '100%' }} />
 }
