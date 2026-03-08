@@ -65,9 +65,10 @@ const nationalAverage: StateData = {
       otherExcise: 0.004,
     },
     {
+      // ~20% capital gains share → blended rate drops from pure ordinary
       label: '95-99%',
       avgIncome: 316800,
-      federalIncome: 0.168,
+      federalIncome: 0.155,
       payroll: 0.072,
       stateIncome: 0.055,
       property: 0.023,
@@ -75,9 +76,10 @@ const nationalAverage: StateData = {
       otherExcise: 0.003,
     },
     {
+      // ~40% capital gains share → significant blending effect
       label: '99-99.9%',
       avgIncome: 1102000,
-      federalIncome: 0.218,
+      federalIncome: 0.195,
       payroll: 0.024,
       stateIncome: 0.058,
       property: 0.019,
@@ -85,9 +87,10 @@ const nationalAverage: StateData = {
       otherExcise: 0.001,
     },
     {
+      // ~55% capital gains share → rate drops noticeably
       label: '99.9-99.99%',
       avgIncome: 5225500,
-      federalIncome: 0.242,
+      federalIncome: 0.205,
       payroll: 0.005,
       stateIncome: 0.052,
       property: 0.014,
@@ -95,9 +98,10 @@ const nationalAverage: StateData = {
       otherExcise: 0.001,
     },
     {
+      // ~65% capital gains share (IRS Top 400 data) → rate dips below 99.9%
       label: 'Top 0.01%',
       avgIncome: 29220000,
-      federalIncome: 0.231,
+      federalIncome: 0.182,
       payroll: 0.001,
       stateIncome: 0.041,
       property: 0.010,

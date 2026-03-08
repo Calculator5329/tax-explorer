@@ -6,7 +6,9 @@ import Legend from './components/Legend'
 import EffectiveRateChart from './components/EffectiveRateChart'
 import WaterfallChart from './components/WaterfallChart'
 import HistoricalChart from './components/HistoricalChart'
+import IncomeCompositionChart from './components/IncomeCompositionChart'
 import { getAllStates, getStateData } from './data/taxData'
+import { INCOME_SOURCES } from './data/incomeComposition'
 import type { BucketData } from './data/types'
 import './App.css'
 
@@ -105,6 +107,21 @@ function App() {
           </div>
           <div className="chart-container">
             <WaterfallChart income={income} buckets={stateData.buckets} />
+          </div>
+        </div>
+
+        <div className="panel full-width income-comp-chart">
+          <div className="panel-title">Income Composition by Source</div>
+          <div className="chart-container">
+            <IncomeCompositionChart />
+          </div>
+          <div className="legend">
+            {INCOME_SOURCES.map(s => (
+              <div className="legend-item" key={s.key}>
+                <span className="legend-swatch" style={{ background: s.color }} />
+                {s.label}
+              </div>
+            ))}
           </div>
         </div>
 

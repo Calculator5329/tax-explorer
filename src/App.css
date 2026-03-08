@@ -59,6 +59,11 @@
   max-height: 400px;
 }
 
+.dashboard-grid .panel.income-comp-chart {
+  min-height: 340px;
+  max-height: 420px;
+}
+
 .state-toggles {
   display: inline-flex;
   gap: 0.35rem;
