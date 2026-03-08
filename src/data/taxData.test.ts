@@ -29,8 +29,8 @@ describe('taxData', () => {
   it('total tax rate is reasonable (under 60% for all buckets)', () => {
     const data = getStateData('US')!
     for (const bucket of data.buckets) {
-      const total = bucket.federalIncome + bucket.payroll + bucket.stateIncome
-        + bucket.property + bucket.salesExcise + bucket.otherExcise
+      const total = bucket.federalIncome + bucket.capitalGains + bucket.payroll
+        + bucket.stateIncome + bucket.property + bucket.salesExcise + bucket.otherExcise
       expect(total).toBeLessThan(0.60)
       expect(total).toBeGreaterThan(0)
     }

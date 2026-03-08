@@ -1,7 +1,8 @@
 export interface BucketData {
   label: string           // e.g. "Bottom 20%"
   avgIncome: number       // average pre-tax income in dollars
-  federalIncome: number   // effective rate as decimal (0.15 = 15%)
+  federalIncome: number   // effective rate on ordinary income as decimal (0.15 = 15%)
+  capitalGains: number    // effective rate from capital gains tax (LTCG + NIIT)
   payroll: number
   stateIncome: number
   property: number
@@ -17,6 +18,7 @@ export interface StateData {
 
 export const TAX_LAYERS = [
   { key: 'federalIncome', label: 'Federal Income Tax', color: '#4e79a7' },
+  { key: 'capitalGains', label: 'Capital Gains Tax', color: '#76b7b2' },
   { key: 'payroll', label: 'Payroll Tax', color: '#59a14f' },
   { key: 'stateIncome', label: 'State Income Tax', color: '#9c755f' },
   { key: 'property', label: 'Property Tax', color: '#f28e2b' },
