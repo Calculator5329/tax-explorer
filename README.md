@@ -1,5 +1,7 @@
 # Tax Explorer
 
+![tax-explorer screenshot](docs/screenshots/app.png)
+
 **Live app → [tax-explorer-app.web.app](https://tax-explorer-app.web.app)**
 
 An interactive dashboard visualizing the total US tax burden across income levels — federal income, capital gains, payroll, state income, property, sales & excise taxes — broken down by income percentile and state.
